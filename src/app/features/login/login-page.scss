@@ -81,12 +81,30 @@ h1 {
 }
 
 .btn-google {
-  background: #4285f4;
-  color: #fff;
+  background: #fff;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  font-family: 'Google Sans', Roboto, Arial, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.25px;
+  gap: 0.75rem;
 
   &:hover:not(:disabled) {
-    background: #357ae8;
+    background: #f8f9fa;
+    border-color: #c6c6c6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   }
+
+  &:focus-visible {
+    outline: 2px solid #4285f4;
+    outline-offset: 2px;
+  }
+}
+
+.google-logo {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
 }
 
 .link-btn {
@@ -97,6 +115,23 @@ h1 {
 
   &:hover {
     text-decoration: underline;
+  }
+}
+
+.legal-links {
+  margin: 1.25rem 0 0;
+  font-size: 0.8rem;
+  color: #718096;
+  text-align: center;
+  line-height: 1.5;
+
+  a {
+    color: #4285f4;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
 
