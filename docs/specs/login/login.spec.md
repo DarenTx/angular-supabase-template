@@ -17,7 +17,7 @@ All Supabase API calls are encapsulated in `AuthenticationService`.
 - **Playwright (E2E) tests**: the full login flow must be covered by Playwright tests, including:
   - Successful Google OAuth redirect
   - Successful magic link submission and confirmation state
-  - Magic link validation errors (empty, invalid format, internal domain)
+  - Magic link validation errors (empty, invalid format)
   - Magic link rate-limit error display
   - `AuthCallbackPage` success redirect and error redirect
   - `authGuard` redirecting unauthenticated users to `/login`
@@ -27,11 +27,10 @@ All Supabase API calls are encapsulated in `AuthenticationService`.
 
 ## Routes
 
-| Path                | Component          | Description                                      |
-| ------------------- | ------------------ | ------------------------------------------------ |
-| `/login`            | `LoginPage`        | Entry point; presents both login options         |
-| `/login/magic-link` | `MagicLinkPage`    | Email entry form for magic link                  |
-| `/login/callback`   | `AuthCallbackPage` | Handles redirect after OAuth or magic link click |
+| Path              | Component          | Description                                      |
+| ----------------- | ------------------ | ------------------------------------------------ |
+| `/login`          | `LoginPage`        | Entry point; presents both login options         |
+| `/login/callback` | `AuthCallbackPage` | Handles redirect after OAuth or magic link click |
 
 ---
 
@@ -57,27 +56,19 @@ Before initiating any OAuth or magic-link flow that leaves the current page, the
   - **Sign in with Google** button → stores the intended destination, then calls `AuthenticationService.signInWithGoogle()`.
     - The button shows a loading/disabled state while the call is in flight.
     - On error → displays the error message inline near the button; the button returns to its active state.
-  - **Sign in with Email** link/button → navigates to `/login/magic-link`.
+  - **Email magic link form** — an email input and a submit button on the same page.
+    - **Validation rules** (evaluated on submit and on blur):
+      - Field must not be empty.
+      - Value must be a well-formed email address.
+    - On valid submit: the submit button immediately becomes disabled and shows a loading indicator, then calls `AuthenticationService.sendMagicLink(email)`.
+    - On success → the form is replaced by a confirmation message telling the user to check their inbox.
+    - On error:
+      - If the service returns a rate-limit error (Supabase error code `over_email_send_rate_limit` or HTTP 429), display: _"Too many attempts. Please wait a moment before trying again."_
+      - For all other errors → display the error message returned by the service.
+      - In both error cases the submit button re-enables so the user can retry.
+    - Accessibility: the email `<input>` has an associated `<label>`, `aria-describedby` pointing to the inline validation error element, and `aria-invalid="true"` when the field is invalid.
 - If the current URL contains an `?error=` query parameter (set by `AuthCallbackPage` on failure), the page reads and displays that error message in a visible error banner at the top of the form. The parameter must be URL-decoded before display.
 - `role="main"` on the page root; the heading has `id="login-heading"` and the `<main>` element references it via `aria-labelledby`.
-
-### `MagicLinkPage`
-
-- Contains a single email input field and a submit button.
-- **Validation rules** (evaluated on submit and on blur):
-  - Field must not be empty.
-  - Value must be a well-formed email address (standard RFC 5322 format).
-  - Value must **not** use the `dahlheritagehomes.com` domain or any subdomain thereof (case-insensitive). See [Email Validation Logic](#email-validation-logic).
-- On valid submit:
-  - The submit button immediately becomes disabled and shows a loading indicator.
-  - Calls `AuthenticationService.sendMagicLink(email)`.
-- On success → the form is replaced by a confirmation message telling the user to check their inbox.
-- On error:
-  - If the service returns a rate-limit error (Supabase error code `over_email_send_rate_limit` or HTTP 429), display the message: _"Too many attempts. Please wait a moment before trying again."_
-  - For all other errors → display the error message returned by the service.
-  - In both error cases the submit button re-enables so the user can retry.
-- Provides a back link to `/login`.
-- Accessibility: the email `<input>` has an associated `<label>`, `aria-describedby` pointing to the inline validation error element, and `aria-invalid="true"` when the field is invalid.
 
 ### `AuthCallbackPage`
 
@@ -95,34 +86,19 @@ Located at `src/app/core/auth/authentication.service.ts`.
 
 ### Methods
 
-| Method                                        | Description                                                                                                                                                                                                                          |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `signInWithGoogle(): Promise<void>`           | Initiates Supabase OAuth flow with Google provider; sets `redirectTo` to the absolute callback URL (e.g., `https://dahlheritagehomes.com/login/callback`).                                                                           |
-| `sendMagicLink(email: string): Promise<void>` | Calls `supabase.auth.signInWithOtp({ email })` with `redirectTo` set to the absolute callback URL (e.g., `https://dahlheritagehomes.com/login/callback`). The `redirectTo` value must be an absolute URL, not a relative path.       |
-| `handleAuthCallback(): Promise<void>`         | Calls `supabase.auth.exchangeCodeForSession(code)` using the PKCE authorization code from the `?code=` query parameter. **Implicit (hash-based) token detection is not used**; if no `code` parameter is present the method throws.  |
-| `getSession(): Observable<Session \| null>`   | Returns the current session as an observable. Uses `supabase.auth.onAuthStateChange` under the hood and replays the latest value (i.e., behaves as a `BehaviorSubject`-like source) so subscribers always receive the current state. |
-| `signOut(): Promise<void>`                    | Calls `supabase.auth.signOut()` and navigates to `/login`.                                                                                                                                                                           |
+| Method                                        | Description                                                                                                                                                                                                                         |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `signInWithGoogle(): Promise<void>`           | Initiates Supabase OAuth flow with Google provider; sets `redirectTo` to the absolute callback URL derived from `environment.appUrl`.                                                                                               |
+| `sendMagicLink(email: string): Promise<void>` | Calls `supabase.auth.signInWithOtp({ email })` with `emailRedirectTo` set to the absolute callback URL derived from `environment.appUrl`. The `redirectTo` value must be an absolute URL, not a relative path.                      |
+| `handleAuthCallback(): Promise<void>`         | Calls `supabase.auth.exchangeCodeForSession(code)` using the PKCE authorization code from the `?code=` query parameter. **Implicit (hash-based) token detection is not used**; if no `code` parameter is present the method throws. |
+| `getSession(): Observable<Session \| null>`   | Returns the current session as an observable. Uses `supabase.auth.onAuthStateChange` under the hood and replays the latest value (i.e., behaves as a `ReplaySubject`-like source) so subscribers always receive the current state.  |
+| `signOut(): Promise<void>`                    | Calls `supabase.auth.signOut()` and navigates to `/login`.                                                                                                                                                                          |
 
 ### Supabase Client
 
-- A single `SupabaseClient` instance is provided at the application root (via `provideSupabase()` or an `APP_INITIALIZER`).
+- A single `SupabaseClient` instance is provided at the application root via `SUPABASE_CLIENT` injection token.
 - `AuthenticationService` injects the client and does not create its own instance.
 - The client must be configured with `auth.flowType: 'pkce'` and `auth.storage: localStorage` to ensure consistent PKCE behavior and session persistence across browser restarts.
-
----
-
-## Email Validation Logic
-
-Implemented as a reusable Angular validator (`noInternalEmailValidator`):
-
-1. Check the value is non-empty.
-2. Verify the value matches the standard email pattern.
-3. Extract the domain portion (everything after `@`).
-4. Reject if `domain.toLowerCase() === 'dahlheritagehomes.com'` **or** `domain.toLowerCase().endsWith('.dahlheritagehomes.com')`.
-
-> **Note**: step 4 uses both an exact match and an `endsWith` subdomain check. The earlier bullet point in `MagicLinkPage` ("must not use the `dahlheritagehomes.com` domain or any subdomain") is the authoritative rule; the `===` check alone is insufficient.
-
-The validator is applied to the reactive form control in `MagicLinkPage`.
 
 ---
 
@@ -141,7 +117,7 @@ An `authGuard` function (functional route guard) protects all non-login routes:
 - **OAuth provider**: Google must be enabled in the Supabase project's Auth settings.
 - **PKCE flow**: the Supabase client must be initialized with `auth.flowType: 'pkce'`. This ensures the authorization code (not an implicit token in the URL hash) is used for the callback exchange, which is more secure.
 - **Redirect URLs** (both must be added to the Supabase allowed redirect URLs list):
-  - `https://dahlheritagehomes.com/login/callback`
+  - `https://your-domain.com/login/callback`
   - `http://localhost:4200/login/callback` (local dev only)
 - **Magic link**: enabled by default with Supabase email OTP; no additional provider configuration needed.
-- **Rate limiting**: Supabase enforces a default email send rate limit. The UI handles the `over_email_send_rate_limit` error code explicitly (see `MagicLinkPage` error handling above).
+- **Rate limiting**: Supabase enforces a default email send rate limit. The UI handles the `over_email_send_rate_limit` error code explicitly (see `LoginPage` email form error handling above).

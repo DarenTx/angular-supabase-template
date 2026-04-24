@@ -1,6 +1,6 @@
 {
-  "name": "dhh",
-  "short_name": "dhh",
+  "name": "Angular Supabase Template",
+  "short_name": "App",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",

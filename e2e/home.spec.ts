@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { environment } from '../src/environments/environment';
 
-const SUPABASE_PROJECT_REF = 'vmzmwdqnnnojzrjpdlnj';
+// Derive project ref from the Supabase URL: https://{project-ref}.supabase.co
+const SUPABASE_PROJECT_REF = new URL(environment.supabase.url).hostname.split('.')[0];
 
 test.describe('Home page', () => {
   test.beforeEach(async ({ page }) => {
@@ -106,6 +108,6 @@ test.describe('Home page', () => {
   });
 
   test('page title should be set', async ({ page }) => {
-    await expect(page).toHaveTitle(/Dhh/i);
+    await expect(page).toHaveTitle(/.+/);
   });
 });

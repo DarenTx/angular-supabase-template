@@ -1,17 +1,17 @@
-# Dahl Heritage Homes
+# Angular Supabase Template
 
 ## Project Info
 
-|                    |                                                                                                   |
-| ------------------ | ------------------------------------------------------------------------------------------------- |
-| **Website**        | [dahlheritagehomes.com](https://dahlheritagehomes.com)                                            |
-| **GitHub**         | [github.com/DarenTx/dhh](https://github.com/DarenTx/dhh)                                          |
-| **Supabase**       | [vmzmwdqnnnojzrjpdlnj](https://supabase.com/dashboard/project/vmzmwdqnnnojzrjpdlnj)               |
-| **Google Console** | [dahl-heritage-homes](https://console.cloud.google.com/auth/overview?project=dahl-heritage-homes) |
+|                    |                            |
+| ------------------ | -------------------------- |
+| **Website**        | _your-domain.com_          |
+| **GitHub**         | _your-github-repo_         |
+| **Supabase**       | _your-supabase-project-id_ |
+| **Google Console** | _your-google-project_      |
 
 ## Description
 
-Property Management Dashboard for Dahl Heritage Homes.
+A starter template for Angular + Supabase applications with Google OAuth and magic link authentication.
 
 ## Tech Stack
 
@@ -35,5 +35,5 @@ Property Management Dashboard for Dahl Heritage Homes.
 npm start          # Dev server → http://localhost:4200
 npm test           # Unit tests (Vitest)
 npm run test:e2e   # Playwright e2e tests (auto-starts dev server)
-ng build           # Production build → dist/dhh
+ng build           # Production build → dist/angular-supabase-template
 ```

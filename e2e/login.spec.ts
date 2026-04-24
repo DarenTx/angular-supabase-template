@@ -44,22 +44,6 @@ test.describe('Login page', () => {
     await expect(page.locator('#email-error')).toContainText('valid email');
   });
 
-  test('shows internal domain error for dahlheritagehomes.com email', async ({ page }) => {
-    await page.locator('#email').fill('user@dahlheritagehomes.com');
-    await page.locator('#email').blur();
-    await expect(page.locator('#email-error')).toContainText(
-      'Do not use a dahlheritagehomes.com email address.',
-    );
-  });
-
-  test('shows internal domain error for subdomain of dahlheritagehomes.com', async ({ page }) => {
-    await page.locator('#email').fill('user@sub.dahlheritagehomes.com');
-    await page.locator('#email').blur();
-    await expect(page.locator('#email-error')).toContainText(
-      'Do not use a dahlheritagehomes.com email address.',
-    );
-  });
-
   test('displays error banner when ?error= query param is present', async ({ page }) => {
     const errorMsg = encodeURIComponent('Session expired. Please sign in again.');
     await page.goto(`${BASE_URL}/login?error=${errorMsg}`);

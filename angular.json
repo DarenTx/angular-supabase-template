@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "dhh": {
+    "angular-supabase-template": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -66,10 +66,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "dhh:build:production"
+              "buildTarget": "angular-supabase-template:build:production"
             },
             "development": {
-              "buildTarget": "dhh:build:development"
+              "buildTarget": "angular-supabase-template:build:development"
             }
           },
           "defaultConfiguration": "development"

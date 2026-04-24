@@ -3,7 +3,6 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthenticationService } from '../../core/auth/authentication.service';
 import { storeRedirectDestination } from '../../core/auth/redirect-destination';
-import { noInternalEmailValidator } from '../../core/auth/no-internal-email.validator';
 import { first } from 'rxjs/operators';
 
 const RATE_LIMIT_CODES = ['over_email_send_rate_limit'];
@@ -29,7 +28,7 @@ export class LoginPage implements OnInit {
   readonly callbackError = signal<string | null>(null);
 
   readonly form = this.fb.group({
-    email: ['', [Validators.required, Validators.email, noInternalEmailValidator]],
+    email: ['', [Validators.required, Validators.email]],
   });
 
   readonly submitting = signal(false);
@@ -45,7 +44,6 @@ export class LoginPage implements OnInit {
     if (!ctrl.touched && !ctrl.dirty) return null;
     if (ctrl.hasError('required')) return 'Email is required.';
     if (ctrl.hasError('email')) return 'Please enter a valid email address.';
-    if (ctrl.hasError('internalEmail')) return 'Do not use a dahlheritagehomes.com email address.';
     return null;
   }
 

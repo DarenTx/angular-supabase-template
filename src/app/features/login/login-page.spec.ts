@@ -128,20 +128,6 @@ describe('LoginPage', () => {
       expect(component.emailErrorMessage).toBe('Please enter a valid email address.');
     });
 
-    it('shows internalEmail error for internal domain', async () => {
-      const { component } = await createFixture();
-      component.emailControl.setValue('user@dahlheritagehomes.com');
-      component.emailControl.markAsTouched();
-      expect(component.emailErrorMessage).toBe('Do not use a dahlheritagehomes.com email address.');
-    });
-
-    it('shows internalEmail error for subdomain of internal domain', async () => {
-      const { component } = await createFixture();
-      component.emailControl.setValue('user@sub.dahlheritagehomes.com');
-      component.emailControl.markAsTouched();
-      expect(component.emailErrorMessage).toBe('Do not use a dahlheritagehomes.com email address.');
-    });
-
     it('returns null error message for untouched clean field', async () => {
       const { component } = await createFixture();
       expect(component.emailErrorMessage).toBeNull();

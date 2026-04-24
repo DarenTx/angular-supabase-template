@@ -36,12 +36,12 @@ jobs:
         run: npm run build
 
       - name: Copy index.html to 404.html for SPA routing
-        run: cp dist/dhh/browser/index.html dist/dhh/browser/404.html
+        run: cp dist/angular-supabase-template/browser/index.html dist/angular-supabase-template/browser/404.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/dhh/browser
+          path: dist/angular-supabase-template/browser
 
   deploy:
     needs: build

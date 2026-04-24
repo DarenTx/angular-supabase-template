@@ -1,8 +1,8 @@
 export const environment = {
   production: true,
   supabase: {
-    url: 'https://vmzmwdqnnnojzrjpdlnj.supabase.co',
-    anonKey: 'sb_publishable_Vhs5WnLFUnG3OSj_gNFu5Q_BAyejxct',
+    url: 'https://your-project-id.supabase.co',
+    anonKey: 'your-supabase-anon-key',
   },
-  appUrl: 'https://dahlheritagehomes.com',
+  appUrl: 'https://your-domain.com',
 };

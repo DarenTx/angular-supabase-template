@@ -31,7 +31,7 @@ export class Home {
       title: 'Scaffolded Angular project',
       description:
         'Created a new Angular 21 project with SCSS styling, routing enabled, and SSR disabled.',
-      command: 'ng new dhh --routing true --style scss --skip-git true',
+      command: 'ng new my-app --routing true --style scss --skip-git true',
     },
     {
       number: 3,
